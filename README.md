@@ -62,6 +62,6 @@ See [job architecture](references/architecture.md), [quality guidance](reference
 
 ## Source privacy and license
 
-Preserve original files, process material you are authorized to use, and respect distribution rights. Book files, generated editions, job checkpoints, and local dependencies are excluded from Git by default. Do not place private book content in tracked files or upload it to unapproved services.
+Preserve original files, process material you are authorized to use, and respect distribution rights. Local job directories (including their generated editions and checkpoints), local dependencies, and agent scratch files are excluded from Git by default. Keep original books outside the tracked repository. Do not place private book content in tracked files or upload it to unapproved services.
 
 ReadFuse source code is licensed under [MIT](LICENSE). Optional dependencies have their own licenses.
