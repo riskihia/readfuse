@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "description": "Example shapes only; generate the real source index with inspect. Pass config to init separately.",
+  "config": {"source_language": "en", "target_language": "id", "mode": "learning", "notes_policy": "selective"},
+  "selection_example": {"chapters": "1-3,8"},
+  "heading_artifact": {"kind": "heading", "unit_id": "ch001", "path": "work/ch001-heading.md"},
+  "translation_artifact": {"kind": "translation", "unit_id": "ch001-s00001", "path": "work/ch001-s00001.md"},
+  "notes_artifact": {"kind": "notes", "unit_id": "ch001-s00001", "path": "work/ch001-s00001-notes.json"},
+  "summary_artifact": {"kind": "summary", "unit_id": "ch001", "path": "work/ch001-summary.md", "segment_ids": ["ch001-s00001"]}
+}
