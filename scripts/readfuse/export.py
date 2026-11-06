@@ -109,6 +109,8 @@ def export_edition(job: Path, formats: list[str]) -> dict:
         store.atomic_write(edition, markdown)
         result = {'edition_sha256': store.sha(markdown), 'formats': {},
                   'requested_complete': report['requested_complete'], 'book_complete': report['book_complete'],
+                    'semantic_review': report['semantic_review'],
+                    'semantic_review_complete': report['semantic_review_complete'],
                   'warnings': ['Font coverage, complex layouts and semantic fidelity still need reader/agent review.']}
         for fmt in formats:
             target = store.safe_path(job, f'edition/book.{fmt}')

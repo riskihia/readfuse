@@ -144,6 +144,9 @@ def chapter_ids(state, cid):
 
 
 def dependencies(state, kind, unit, coverage=None):
+    if kind == 'review':
+        from .review import review_dependency
+        return review_dependency(state, unit)
     segments = {s['id']: s for s in state['index']['segments']}
     if kind in ('translation', 'notes'):
         if unit not in segments or unit not in state['selected']:
@@ -219,9 +222,28 @@ def record_artifact(job: Path, artifact: dict) -> None:
             kind, unit = artifact['kind'], artifact['unit_id']
             key = f'{kind}:{unit}'
             dep = dependencies(state, kind, unit, artifact.get('segment_ids'))
+            path, relative = validate_artifact_path(job, state, artifact['path'], key)
+            review_payload = None
+            if kind == 'review':
+                from .review import validate_review
+                review_payload = json.loads(path.read_text(encoding='utf-8'))
+                validate_review(review_payload, state, unit)
+                for context_name, expected_hash in review_payload.get('context_inputs', {}).items():
+                    context_path, _ = validate_artifact_path(job, state, context_name, key)
+                    if not context_path.is_file() or sha(context_path.read_bytes()) != expected_hash:
+                        raise ValueError(f'Review context input missing or changed: {context_name}')
+                # A successful semantic review requires every content prerequisite to
+                # be present, byte-valid, and dependency-current at record time.
+                if review_payload['verdict'] == 'passed':
+                    snapshot = report(job, state)
+                    required = set(dep['inputs'])
+                    content_issues = [issue for issue in snapshot['issues']
+                                      if any(issue.startswith(input_key + ':') for input_key in required)]
+                    if (content_issues or not required.issubset(snapshot['valid'])
+                            or required.intersection(state['failures'])):
+                        raise ValueError('Cannot pass semantic review while chapter content is missing, corrupt, or stale')
             if kind == 'summary' and artifact.get('segment_ids') != chapter_ids(state, unit):
                 raise ValueError('New summary must cover exactly the selected source portions in order')
-            path, relative = validate_artifact_path(job, state, artifact['path'], key)
             text = path.read_text(encoding='utf-8')
             if not text.strip():
                 raise ValueError('Artifact is empty')
@@ -232,10 +254,11 @@ def record_artifact(job: Path, artifact: dict) -> None:
                     raise ValueError('Translate before reviewing explanatory notes')
                 validate_notes(text, unit)
             mode = state['config']['mode']
-            if (mode == 'translate' and kind not in ('translation', 'heading')) or (mode == 'summarize' and kind not in ('summary', 'heading')):
+            if kind != 'review' and ((mode == 'translate' and kind not in ('translation', 'heading')) or (mode == 'summarize' and kind not in ('summary', 'heading'))):
                 raise ValueError('Artifact kind not requested by job mode')
             state['artifacts'][key] = {'kind': kind, 'unit_id': unit, 'path': relative, 'sha256': sha(path.read_bytes()),
-                                       'segment_ids': artifact.get('segment_ids', [unit]), 'dependency': fingerprint(dep)}
+                                       'segment_ids': artifact.get('segment_ids', [unit]), 'dependency': fingerprint(dep),
+                                       **({'context_inputs': review_payload.get('context_inputs', {})} if kind == 'review' else {})}
             state['failures'].pop(key, None)
             save(job, state)
         except (KeyError, TypeError, AttributeError) as exc:
@@ -289,8 +312,13 @@ def report(job, state):
     if index['source']['format'] == 'pdf':
         covered_pages = {a['page'] for s in index['segments'] for a in s['anchors']}
         source_coverage_complete = covered_pages == set(range(1, index['page_count'] + 1))
+    from .review import review_status
+    semantic = review_status(job, state, valid)
+    review_complete = bool(state['selected']) and not issues and not pending and not state['failures'] and all(
+        semantic.get(c['id']) == 'passed' for c in index['chapters'] if chapter_ids(state, c['id']))
     return {'issues': issues, 'pending': pending, 'stale': stale, 'failed': state['failures'], 'valid': valid,
             'selected': state['selected'], 'requested_complete': complete,
+            'semantic_review': semantic, 'semantic_review_complete': review_complete,
             'book_complete': complete and source_coverage_complete and len(state['selected']) == len(index['segments']),
             'source_coverage_complete': source_coverage_complete,
             'revision': state['revision'], 'warnings': state['index']['warnings']}

@@ -59,6 +59,7 @@ def parser():
             command.add_argument('--formats', required=True)
         elif name == 'verify':
             command.add_argument('--require-complete', action='store_true')
+            command.add_argument('--require-reviewed', action='store_true')
     return p
 
 
@@ -105,7 +106,8 @@ def main(argv=None):
                 code = 1
         else:
             result = store.status(args.job_dir)
-            if command == 'verify' and (result['issues'] or (args.require_complete and not result['requested_complete'])):
+            if command == 'verify' and (result['issues'] or (args.require_complete and not result['requested_complete'])
+                                        or (args.require_reviewed and not result['semantic_review_complete'])):
                 code = 1
         # ASCII-safe JSON also works in older Windows consoles; files remain UTF-8.
         print(json.dumps(result, ensure_ascii=True, indent=2))

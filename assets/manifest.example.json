@@ -6,5 +6,7 @@
   "heading_artifact": {"kind": "heading", "unit_id": "ch001", "path": "work/ch001-heading.md"},
   "translation_artifact": {"kind": "translation", "unit_id": "ch001-s00001", "path": "work/ch001-s00001.md"},
   "notes_artifact": {"kind": "notes", "unit_id": "ch001-s00001", "path": "work/ch001-s00001-notes.json"},
-  "summary_artifact": {"kind": "summary", "unit_id": "ch001", "path": "work/ch001-summary.md", "segment_ids": ["ch001-s00001"]}
+  "summary_artifact": {"kind": "summary", "unit_id": "ch001", "path": "work/ch001-summary.md", "segment_ids": ["ch001-s00001"]},
+  "review_artifact": {"kind": "review", "unit_id": "ch001", "path": "work/ch001-review.json"},
+  "review_report_example": {"version": 1, "chapter_id": "ch001", "coverage": ["ch001-s00001"], "source_sha256": "<sha256>", "source_segments": {"ch001-s00001": "<sha256>"}, "inputs": {"heading:ch001": "<sha256>", "translation:ch001-s00001": "<sha256>", "notes:ch001-s00001": "<sha256>", "summary:ch001": "<sha256>"}, "checks": ["completeness", "polarity_modality", "relations_details", "terminology", "references_structure", "fluency"], "verdict": "passed", "findings": [], "limitations": ["Agent review against extracted source; not independent accuracy certification."]}
 }

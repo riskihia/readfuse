@@ -18,7 +18,7 @@ Later:
 
 > Continue this job with chapter 8, keep valid chapters 1-3, and update the same edition.
 
-ReadFuse first inspects structure and text quality; uncertain chapter boundaries need review. PDF page selectors refer to 1-based file page positions, which can differ from printed labels. Partial editions explicitly show missing chapters/portions. A successful integrity check is not proof of semantic accuracy or complete extraction.
+ReadFuse first inspects structure and text quality; uncertain chapter boundaries need review. PDF page selectors refer to 1-based file positions, which can differ from printed labels. Partial editions show missing chapters/portions. Integrity is not proof of semantic accuracy or complete extraction. `verify --require-reviewed` requires complete selected content and a current passed agent review for each selected chapter; this records agent review, not independent certification. Draft editions remain available and identify incomplete review.
 
 ## Requirements
 
@@ -51,7 +51,7 @@ python scripts/readfuse_cli.py verify --job-dir .readfuse-jobs/demo --require-co
 python scripts/readfuse_cli.py export --job-dir .readfuse-jobs/demo --formats md,epub,pdf
 ```
 
-Outputs: `.readfuse-jobs/demo/edition/book.md`, `book.epub`, `book.pdf`, and `export-report.json`. The report marks selected coverage complete and the book partial. If optional dependencies are missing, Markdown is delivered and requested unavailable formats report errors with a nonzero CLI exit. Existing exports survive failed replacement; consult the latest report before treating an old file as current.
+Outputs: `.readfuse-jobs/demo/edition/book.md`, `book.epub`, `book.pdf`, and `export-report.json`. The report marks selected coverage complete and the book partial. The example has no chapter semantic-review record, so `status.semantic_review_complete` is false and `verify --require-reviewed` will fail until the host agent creates and records one. If optional dependencies are missing, Markdown is delivered and requested unavailable formats report errors with a nonzero CLI exit. Existing exports survive failed replacement; consult the latest report before treating an old file as current.
 
 For another selection, use `select --chapters 4` or `select --pages 20-22` on a PDF job. The agent creates and reviews only pending artifacts, then assembles/exports again. Overlap is deduplicated and chapter summaries become stale when their coverage grows. Do not copy sample translations into another book.
 
@@ -64,7 +64,7 @@ python -m unittest discover -s tests -v
 python scripts/readfuse_cli.py --help
 ```
 
-Optional-format tests explicitly skip when dependencies are absent. Tests cover source/spine order, selected and partial coverage, 1-3 -> 8 -> 4 continuation, overlap, artifact invalidation, corruption, locks, interrupted writes and export failures. A short original example supports manual source/translation/notes/summary review; these tests do not certify multilingual book-quality translation.
+Optional-format tests explicitly skip when dependencies are absent. Tests cover source/spine order, selected and partial coverage, 1-3 -> 8 -> 4 continuation, overlap, artifact invalidation, semantic-review snapshots, corruption, locks, interrupted writes and export failures. Original short fixtures exercise meaning-sensitive review criteria; these tests do not certify multilingual book-quality translation.
 
 ## Legacy and installation
 

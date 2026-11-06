@@ -1,0 +1,17 @@
+{
+  "description": "Original miniature passages for source-grounded review. Evaluate meaning rather than exact preferred wording.",
+  "cases": [
+    {"id":"missing_sentence","source":"The tank was empty at dawn. By noon, rain had filled it halfway.","candidate":"Saat fajar, tangki itu kosong.","expected_findings":["omission: the noon rain and halfway level are absent"],"acceptable_variations":[]},
+    {"id":"softened_negation","source":"This failure is not caused by a weak motor.","candidate":"Kegagalan ini bukan semata-mata disebabkan oleh motor yang lemah.","expected_findings":["meaning: absolute negation becomes partial exclusion"],"acceptable_variations":[]},
+    {"id":"changed_property","source":"She wrapped a loose chain around the post.","candidate":"Ia melilitkan rantai lentur di sekeliling tiang.","expected_findings":["detail: looseness replaced by flexibility"],"acceptable_variations":[]},
+    {"id":"invented_midpoint","source":"He held the cord partway down from its upper end.","candidate":"Ia memegang tali tepat di titik tengahnya.","expected_findings":["detail: exact midpoint is unsupported"],"acceptable_variations":[]},
+    {"id":"ellipsis_as_footnote","source":"They waited.\u2026 Then the gate opened.","candidate":"Mereka menunggu.\u00b9 Lalu gerbang terbuka.","expected_findings":["reference: ellipsis becomes invented reference marker"],"acceptable_variations":[]},
+    {"id":"unlabeled_explanation","source":"The reader may need time to notice the pattern.","candidate":"Pembaca mungkin membutuhkan waktu untuk melihat polanya karena otak selalu bekerja dalam tiga tahap tetap.","expected_findings":["addition: unsupported explanation is inserted into author voice"],"acceptable_variations":[]},
+    {"id":"split_sentence_valid","source":"The gate closed because the wind changed direction.","candidate":"Arah angin berubah. Itulah yang membuat gerbang tertutup.","expected_findings":[],"acceptable_variations":["one source sentence may become two while preserving cause and event"]},
+    {"id":"natural_equivalent_a","source":"She noticed a pattern in the weekly readings.","candidate":"Ia melihat pola pada hasil pengukuran mingguan.","expected_findings":[],"acceptable_variations":["noticed can be melihat or menyadari in this context"]},
+    {"id":"natural_equivalent_b","source":"She noticed a pattern in the weekly readings.","candidate":"Ia menyadari adanya pola dalam hasil pengukuran tiap minggu.","expected_findings":[],"acceptable_variations":["no need for identical wording to equivalent_a"]},
+    {"id":"supported_specificity","context":"The narrator teaches an undergraduate engineering course at a university.","source":"I asked the students to draw the circuit.","candidate":"Saya meminta para mahasiswa menggambar rangkaian itu.","expected_findings":[],"acceptable_variations":["university context supports mahasiswa"]},
+    {"id":"indefinite_article_valid","source":"That is a useful principle for arranging the shelves.","candidate":"Itulah prinsip yang berguna untuk menata rak-rak itu.","expected_findings":[],"acceptable_variations":["a does not require salah satu or sebuah mechanically"]},
+    {"id":"labeled_note_valid","source":"A delayed signal can affect the next decision.","candidate":"Sinyal yang terlambat dapat memengaruhi keputusan berikutnya.","note":"Catatan ReadFuse - Contoh tambahan: bayangkan pesan perubahan jadwal baru tiba setelah kamu berangkat.","expected_findings":[],"acceptable_variations":["clearly labeled illustration is separate from translated author text"]}
+  ]
+}

@@ -24,6 +24,10 @@ def render(job, state, report):
     lab = labels(state['config'])
     valid = set(report['valid']) - set(report['failed'])
     parts = [f'# {lab["title"]}', lab['complete'] if report['book_complete'] else lab['partial']]
+    if not report.get('semantic_review_complete', False):
+        parts.append('**Status review semantik:** belum semua bab terpilih memiliki review semantik terbaru.'
+                     if state['config']['target_language'].lower().split('-')[0] == 'id'
+                     else '**Semantic review status:** not all selected chapters have a current semantic review.')
     missing = [c['title'] for c in state['index']['chapters']
                if any(f'translation:{sid}' not in valid for sid in c['segment_ids'])]
     if state['config']['mode'] == 'summarize':

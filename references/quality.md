@@ -8,7 +8,11 @@ Reject unknown/missing source units, output corruption, unreviewed notes and sta
 
 ## Editorial review by the agent
 
-Compare original text and translation for omissions, changed negations/numbers/causality, lost uncertainty, altered examples, inconsistent terminology and voice. Check representative beginning/middle/end passages plus every known difficult fragment. Expand review where a sample reveals issues. Length/structure checks and LLM self-review do not prove accuracy.
+Compare the original and target for every sentence and meaningful clause in the entire selected coverage; a beginning/middle/end sample is not enough to establish completeness. Keep them visible side by side. Record substantive omissions, additions, meaning/detail changes and source uncertainty with brief source/target evidence. Sentence splitting or merging is acceptable when each claim and relationship remains represented.
+
+Check negation, modality, certainty, quantifiers, attribution, actors/referents, causality, contrast, conditions, sequence, properties, direction, position, examples, terms, references, numbers and voice. Then compare once more after fluency edits, including paragraph/list restructuring. Revisit notes when their translation changes and verify summary claims against the original selected passages. Separate an actual meaning problem from acceptable style variation. Length/structure checks, hashes and LLM self-review do not prove accuracy.
+
+If a semantic review record is requested, its checklist documents that the agent performed these checks against the current source and artifacts. A passed record is not an independent accuracy certification; unresolved substantive findings require `needs_revision`.
 
 Check each summary claim against its original covered source. Ensure partial coverage is labeled and opinions retain attribution. Check every ReadFuse note for contextual fit, short accessible phrasing and clearly distinguished added examples. Notes must not smuggle new claims into translated prose.
 
