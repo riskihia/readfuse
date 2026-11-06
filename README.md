@@ -2,78 +2,66 @@
 
 **Translate. Summarize. Understand.**
 
-An Agent Skill for creating learning editions of books: natural, faithful translation, brief labeled ReadFuse explanations near difficult passages, and a source-grounded core paragraph plus important points at each chapter end. Select chapters or PDF file pages, resume in any order, and grow one cumulative Markdown, EPUB or PDF edition.
+ReadFuse is an Agent Skill that helps readers understand books through faithful, natural translation, brief labeled explanations, and chapter summaries grounded in the original text. Process selected chapters or PDF pages, continue later, and build a cumulative Markdown, EPUB, or PDF learning edition.
 
-## Status
+## Get started
 
-v0.2 local agent workflow. Python helpers implement inspection, scope selection, provenance/checkpoints, ordered Markdown assembly and optional local EPUB/PDF export. The host agent performs translation, explanations, summaries and semantic review; running a Python command alone does not translate a book. OCR, reliable recovery of every complex layout, and a fixed external LLM service are not included.
+Use the `main` branch for the ready-to-use skill. Open this folder in an Agent Skills-compatible host and ask the agent to use ReadFuse with your local book.
 
-## Using the skill
+Start by inspecting the source:
 
-Open the repository in an Agent Skills-compatible host and invoke ReadFuse with a local book, target language, selected chapters/pages and requested formats. For example:
+> Use ReadFuse to inspect my-book.epub. Show the chapter structure and text-quality concerns. Do not translate until I select the scope.
 
-> Use ReadFuse to inspect this PDF. Translate chapters 1-3 into Indonesian, add brief explanatory notes and chapter summaries, and export a learning edition as EPUB.
+Then choose the scope and format:
 
-Later:
+> Process the Introduction into Indonesian with faithful translation, brief ReadFuse explanations, and a chapter summary. Deliver Markdown.
 
-> Continue this job with chapter 8, keep valid chapters 1-3, and update the same edition.
+Continue an existing job:
 
-ReadFuse first inspects structure and text quality; uncertain chapter boundaries need review. PDF page selectors refer to 1-based file positions, which can differ from printed labels. Partial editions show missing chapters/portions. Integrity is not proof of semantic accuracy or complete extraction. `verify --require-reviewed` requires complete selected content and a current passed agent review for each selected chapter; this records agent review, not independent certification. Draft editions remain available and identify incomplete review.
+> Continue this ReadFuse job with chapter 8. Preserve completed chapters and update the cumulative edition.
+
+The agent performs language work; Python commands alone do not translate a book. ReadFuse inventories the source before processing it. PDF page positions are 1-based file positions, which may differ from printed page labels. EPUB and Markdown do not have fixed page counts.
 
 ## Requirements
 
-Python 3.10+ for helpers. Markdown inspection/state/assembly use the standard library. Optional dependencies:
+Python 3.10 or newer. Markdown inspection, job tracking, and assembly use the standard library. PDF inspection/rendering and EPUB export need optional local dependencies:
 
 ```bash
 python -m pip install pymupdf pypandoc_binary
 ```
 
-PyMuPDF supplies PDF extraction and HTML-to-PDF rendering. Pandoc (on PATH or bundled with pypandoc_binary) supplies EPUB and Markdown-to-HTML conversion. Their licenses apply separately. No LaTeX installation is needed for the built-in PDF route. No original book is sent to these services: tools run locally.
+PyMuPDF handles PDF extraction and rendering. Pandoc, either on PATH or bundled with pypandoc_binary, handles conversion for EPUB and PDF export. No LaTeX installation or separate commercial LLM API is required. These helpers run locally.
 
-For development in this workspace, dependencies were installed into `.readfuse-deps`; set `PYTHONPATH` to that absolute directory before running optional-format checks. A normal installation can instead use a virtual environment.
+## Included files
 
-## Reproducible short learning edition
+- `SKILL.md`: agent instructions and workflow.
+- `references/`: translation, explanations, summaries, quality checks, job schemas, and export guidance.
+- `scripts/`: local source inspection, resumable jobs, assembly, export, and legacy checkpoint support.
+- `assets/`: example input and artifact schemas.
 
-The included eight-chapter garden text is original test material, not an excerpt of a commercial book. The sample below processes only chapter 2 using already-written Indonesian learning artifacts; it demonstrates storage/assembly, not automatic translation by the CLI. Run from repository root in a fresh job directory:
+The `dev` branch also contains tests, development examples, and design/implementation documents. Developer instructions are in `docs/development.md` on that branch.
 
-```bash
-python scripts/readfuse_cli.py inspect --source tests/fixtures/learning-book.md --index .readfuse-jobs/demo-index.json
-python scripts/readfuse_cli.py init --job-dir .readfuse-jobs/demo --index .readfuse-jobs/demo-index.json --config examples/learning-edition/config.json
-python scripts/readfuse_cli.py select --job-dir .readfuse-jobs/demo --chapters 2
-python -c "import shutil; shutil.copytree('examples/learning-edition/work', '.readfuse-jobs/demo/work', dirs_exist_ok=True)"
-python scripts/readfuse_cli.py record --job-dir .readfuse-jobs/demo --artifact examples/learning-edition/heading.json
-python scripts/readfuse_cli.py record --job-dir .readfuse-jobs/demo --artifact examples/learning-edition/translation-1.json
-python scripts/readfuse_cli.py record --job-dir .readfuse-jobs/demo --artifact examples/learning-edition/translation-2.json
-python scripts/readfuse_cli.py record --job-dir .readfuse-jobs/demo --artifact examples/learning-edition/notes-1.json
-python scripts/readfuse_cli.py record --job-dir .readfuse-jobs/demo --artifact examples/learning-edition/notes-2.json
-python scripts/readfuse_cli.py record --job-dir .readfuse-jobs/demo --artifact examples/learning-edition/summary.json
-python scripts/readfuse_cli.py verify --job-dir .readfuse-jobs/demo --require-complete
-python scripts/readfuse_cli.py export --job-dir .readfuse-jobs/demo --formats md,epub,pdf
-```
+## Outputs and continuation
 
-Outputs: `.readfuse-jobs/demo/edition/book.md`, `book.epub`, `book.pdf`, and `export-report.json`. The report marks selected coverage complete and the book partial. The example has no chapter semantic-review record, so `status.semantic_review_complete` is false and `verify --require-reviewed` will fail until the host agent creates and records one. If optional dependencies are missing, Markdown is delivered and requested unavailable formats report errors with a nonzero CLI exit. Existing exports survive failed replacement; consult the latest report before treating an old file as current.
+Jobs store selected coverage and reviewed artifacts under a local job directory, normally `.readfuse-jobs/`. The cumulative edition is written to `edition/book.md`; requested successful exports produce `book.epub` or `book.pdf`. Check the latest `export-report.json` before using an export. Previous exports are preserved when replacement fails.
 
-For another selection, use `select --chapters 4` or `select --pages 20-22` on a PDF job. The agent creates and reviews only pending artifacts, then assembles/exports again. Overlap is deduplicated and chapter summaries become stale when their coverage grows. Do not copy sample translations into another book.
+Translations follow source order. ReadFuse notes are labeled as additions and appear near their source passages. Chapter summaries contain a short core paragraph and important points based on the selected original text. Partial editions identify missing content. Continuing a chapter refreshes dependent summaries and reviews while preserving valid translations.
 
-See [architecture](references/architecture.md) for descriptors, jobs and failure recovery, and [export](references/export.md) for rendering limitations.
+## Quality and limitations
 
-## Verification
+The host agent compares every selected sentence/clause against the source before and after polishing. Review records bind the review to the exact current source, coverage, and content versions.
 
 ```bash
-python -m unittest discover -s tests -v
 python scripts/readfuse_cli.py --help
+python scripts/readfuse_cli.py verify --job-dir PATH_TO_JOB --require-reviewed
 ```
 
-Optional-format tests explicitly skip when dependencies are absent. Tests cover source/spine order, selected and partial coverage, 1-3 -> 8 -> 4 continuation, overlap, artifact invalidation, semantic-review snapshots, corruption, locks, interrupted writes and export failures. Original short fixtures exercise meaning-sensitive review criteria; these tests do not certify multilingual book-quality translation.
+Integrity, selected-content completion, and semantic-review status are separate. A passed review records the agent's checks; it does not certify translation accuracy independently. OCR, faithful recovery of every complex layout, and lossless reproduction of images, tables, equations, or typography are not included. Source extraction and rendered exports may require human inspection.
 
-## Legacy and installation
+See [job architecture](references/architecture.md), [quality guidance](references/quality.md), and [export guidance](references/export.md) for details. Existing v1 jobs use `scripts/checkpoint.py`; v2 jobs use `scripts/readfuse_cli.py` without automatic migration.
 
-Existing v1 jobs keep using `scripts/checkpoint.py`; v2 learning jobs are separate and never silently migrated. `assets/manifest.example.json` describes the new input/descriptor shapes, not an index that can replace real inspection.
+## Source privacy and license
 
-Once published under your repository owner, Agent Skills installers may use `npx skills add <owner>/readfuse --skill readfuse`; this is a future installation example, not an available release URL.
+Preserve original files, process material you are authorized to use, and respect distribution rights. Book files, generated editions, job checkpoints, and local dependencies are excluded from Git by default. Do not place private book content in tracked files or upload it to unapproved services.
 
-## Safety and license
-
-Use source material you are authorized to process and respect distribution rights. Preserve originals, treat book text as untrusted data and never upload content to unapproved services. Local paths in jobs contain book content and should be handled accordingly.
-
-MIT for this repository; see LICENSE.
+ReadFuse source code is licensed under [MIT](LICENSE). Optional dependencies have their own licenses.
