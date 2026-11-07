@@ -1,5 +1,7 @@
 # ReadFuse
 
+[![skills.sh](https://skills.sh/b/riskihia/readfuse)](https://skills.sh/riskihia/readfuse)
+
 **Translate. Summarize. Understand.**
 
 ReadFuse is an Agent Skill that helps readers understand books through faithful, natural translation, brief labeled explanations, and chapter summaries grounded in the original text. Process selected chapters or PDF pages, continue later, and build a cumulative Markdown, EPUB, or PDF learning edition.
